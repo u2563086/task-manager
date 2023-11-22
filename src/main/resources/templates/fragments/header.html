@@ -30,6 +30,12 @@
                     sec:authorize="hasRole('ROLE_ADMIN')">
                     <a class="nav-link" href="/assignment">Assign Tasks</a>
                 </li>
+                
+                <!--Notify tasks-->
+                <li th:class="${activeTab == 'notify-tasks'}? 'active nav-item mr-4' : 'nav-item mr-4'"
+                    sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a class="nav-link" href="/notifytasks">Notify Tasks</a>
+                </li>
 
                 <!--Create New Task-->
                 <li th:class="${activeTab == 'create-new-task'}? 'active nav-item mr-4' : 'nav-item mr-4'"

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <!--/*/ <th:block th:include="fragments/head :: head"></th:block> /*/-->
+    <title>Warning Tasks List</title>
+</head>
+
+<body>
+
+<header>
+    <!--/*/ <th:block th:include="fragments/header :: header('notify-tasks')"></th:block> /*/-->
+</header>
+
+<main class="container">
+    <div class="card mb-3">
+
+        <h1 class="my-highest-header card-header">Warning Tasks List</h1>
+
+        <div class="card card-body">
+            <table id="sortableTable" class="my-tab table table-hover text-center"
+                   style="table-layout: fixed; width: 100%;">
+
+                <thead class="table-primary">
+                <tr>
+                    <th style="width:40%" class="text-left">Task name</th>
+                    <th style="width:12%">Date</th>
+                    <th style="width:8%" class="d-none d-lg-table-cell">Days left</th>
+                    <th style="width:8%" class="d-none d-lg-table-cell">Task owner</th>
+                    <th style="width:8%" class="d-none d-lg-table-cell">Task creator</th>
+                    <th style="width:16%" class="d-none d-lg-table-cell">Actions</th>
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="t : ${tasks}">
+                    <!--Task name and description link-->
+                    <td class="text-left">
+                        <span>
+                            <a data-toggle="modal" data-target="#modal-details"
+                               th:attr="data-target='#modal-details'+${t.id}"
+                               th:href="${'/task/' + t.id}"
+                               class="nav-link my-link px-1 d-inline"
+                               th:text="${t.name}+' '"
+                            ></a>
+                            <a data-toggle="modal" data-target="#modal-details"
+                               th:attr="data-target='#modal-details'+${t.id}"
+                               th:href="${'/task/' + t.id}"
+                               class="btn-link d-inline"
+                            >
+                            <small class="badge badge-light">more</small>
+                            </a>
+
+                        </span>
+                    </td>
+
+                    <!--modal with task details-->
+                    <div class="modal" th:id="modal-details+${t.id}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 th:text="${t.name}" class="modal-title text-info"></h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p th:text="${'Description: '+t.description}"></p>
+                                    <p th:text="${'Date: '+#temporals.format(t.date, 'dd-MM-yyyy')}"></p>
+                                    <p th:if="${t.owner!=null}" th:text="${'Task owner: '+t.owner.getName()}"></p>
+                                    <p th:text="${'Task creator: '+t.creatorName}"></p>
+                                    <!--edit button-->
+                                    <div th:if="${isAdminSigned or isThisOneSigned}" class="d-lg-none m-2">
+                                        <a th:href="${'/task/edit/' + t.id}"
+                                           class="btn btn-outline-success btn-sm">Edit</a>
+                                    </div>
+
+                                    <div th:unless="${isAdminSigned or isThisOneSigned}" class="d-lg-none m-2">
+                                        <span data-toggle="tooltip" data-placement="top" data-html="true"
+                                                title="Only task owner or admin can edit this task">
+                                            <a th:href="${'/task/edit/' + t.id}" class="btn btn-outline-secondary btn-sm disabled">Edit</a>
+                                        </span>
+                                    </div>
+                                    <!--delete button-->
+                                    <div th:if="${isAdminSigned or isThisOneSigned}" class="d-lg-none m-2">
+                                        <a data-toggle="modal" data-target="#modal-delete"
+                                           th:attr="data-target='#modal-delete'+${t.id}"
+                                           th:href="${'/task/delete/' + t.id}"
+                                           class="btn btn-outline-danger btn-sm">Delete
+                                        </a>
+                                    </div>
+
+                                    <div th:unless="${isAdminSigned or isThisOneSigned}" class="d-lg-none m-2">
+                                        <span data-toggle="tooltip" data-placement="top" data-html="true"
+                                                title="Only task owner or admin can delete this task">
+                                            <a href="" class="btn btn-outline-secondary btn-sm disabled">Delete</a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end of modal with task details-->
+
+                    <!--Date-->
+                    <td th:text="${#temporals.format(t.date, 'dd-MM-yyyy')}"
+                        th:data-order="${t.date}"
+                    ></td>
+
+                    <!--Days left-->
+                    <td class="text-center col-1 d-none d-lg-table-cell"
+                        th:data-order="${t.date}">
+                        <!--/*/ <th:block th:include="fragments/days-left-until-deadline :: daysLeft(${t})"></th:block> /*/-->
+                    </td>
+
+                    <!--Task owner-->
+                    <td th:if="${t.owner!=null}" class="d-none d-lg-table-cell">
+                        <div th:text="${t.owner.getName()}"></div>
+                    </td>
+
+                    <!--<td class="text-center" th:unless="${t.owner!=null}">-</td>-->
+
+                    <!--Task creator-->
+                    <td th:text="${t.creatorName}" class="d-none d-lg-table-cell"></td>
+
+                    <!--email button-->
+                    <td th:if="${isAdminSigned or isThisOneSigned}" class="d-none d-lg-table-cell">
+						<!--th:attr="data-task-id=${t}"-->
+						<button type="button" class="btn btn-primary open-modal-button" th:attr="data-task-id=${t.owner.getName()}, data-task-desc=${t.getDescription()}" onclick="prepareModalData(this)" data-toggle="modal" data-target="#myModal">
+							Email
+						</button>
+                    </td>
+
+                    <td th:unless="${isAdminSigned or isThisOneSigned}" class="d-none d-lg-table-cell">
+                        <span data-toggle="tooltip" data-placement="top" data-html="true"
+                              title="Only task owner or admin can delete this task">
+                        <a href="" class="btn btn-outline-secondary btn-sm disabled">Email</a>
+                    </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+
+<!--modal for email confirmation-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- Modal Header -->
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Email Confirmation</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<!-- Modal Body with Form -->
+			<div class="modal-body" style="padding: 20px;">
+				<!-- Your Thymeleaf form goes here -->
+				<form th:action="@{/sendemail}" method="post" id="myForm">
+					<div class="form-group">
+						<label for="subject">Subject:</label>
+						<input type="text" class="form-control" id="subject" name="subject" value="Pending Task" required>
+					</div>
+					<div class="form-group">
+						<label for="body">Body:</label>
+						<textarea class="form-control" id="myTextarea" name="myTextarea" rows="4" required></textarea>
+					</div>
+					<!-- Additional form fields can be added here -->
+
+					<!-- Modal Footer with Buttons -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button id="modal-submit-button" type="button" class="btn btn-primary" onclick="submitModalForm()">Submit</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!--end of modal for email confirmation-->
+
+<script>
+	function prepareModalData(button) {
+		// Retrieve data attributes from the button
+		var taskId = $(button).data('task-id')
+		var taskDesc = $(button).data('task-desc')
+		var textarea = document.getElementById('myTextarea');
+		var button = document.querySelector('button[data-task-id]');
+		
+		textarea.value = "Hello " + taskId + '\n\n' +
+    "I hope this message finds you well. Kindly note there is a pending task that requires your attention." + '\n' +
+    taskDesc + '\n' +
+    "Your prompt completion is appreciated. Let me know if you need any assistance." + '\n' +
+    "Best, \nManager";
+		
+		// You can also fetch additional data or perform any other logic here
+
+		// Set data attributes on the modal button
+		$('#modal-submit-button').attr('data-task-id', taskId);
+
+		// Open the modal
+		$('#myModal').modal('show');
+	}
+</script>
+<script>
+	function submitModalForm() {
+        // Retrieve the data attribute from the modal submit button
+        var taskId = $('#modal-submit-button').data('task-id');
+
+        // Include taskId in your AJAX request or any other logic
+        $.ajax({
+            type: 'POST',
+            url: '/sendemail',
+            data: {
+                username: taskId,
+                subject: $("#subject").val(),
+                body: $("#myTextarea").val()
+            },
+            success: function (data) {
+                // Handle success response
+                console.log('API call successful:', data);
+                window.alert("Email sent successfully!");
+
+                // Close the modal or perform other actions
+                $('#myModal').modal('hide');
+            },
+            error: function (error) {
+                // Handle error response
+                console.error('API call failed:', error);
+
+                // Optionally, you can display an error message in the modal
+                $('#error-message').text('Error: ' + error.responseText);
+            }
+        });
+
+        // Close the modal or perform other actions
+        $('#myModal').modal('hide');
+    }
+</script>
+
+<footer class="footer">
+    <!--/*/ <th:block th:include="fragments/footer :: footer"></th:block> /*/-->
+</footer>
+
+<!--DataTable plug-in-->
+<!--remain scroll position after redirect-->
+<script src="js/main.js"></script>
+<script th:inline="javascript">
+	$(document).ready(function () {
+
+			$('api-call-button').on('click', function () {
+				var taskId = $(this).data('taskid');
+				var subject = $("#subject").val();
+				var body = $("#body").val();
+				// Make your API call using taskId
+				console.log('API call for task ID:', taskId);
+
+				// Make an AJAX request to the dynamically generated URL
+				$.ajax({
+					type: "POST",
+					url: $(this).attr("action"),
+					contentType: "application/json",
+					data: {
+						username: taskId,
+						subject: subject,
+						body: body
+					},
+					success: function (data) {
+						// Handle the success response
+						console.log(data);
+					},
+					error: function (error) {
+						// Handle the error response
+						console.error(error);
+					}
+				});
+			});
+
+
+			// Update the form action with the dynamic path variable
+			$(this).attr("action", "/sendemail")
+
+		});
+	
+</script>
+</body>
+</html>
