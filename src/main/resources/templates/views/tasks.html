@@ -16,11 +16,14 @@
     <div class="card mb-3">
 
         <h1 class="my-highest-header card-header">Tasks List
+			<span>
+                <a href="/task/create" class="btn btn-outline-info btn-lg float-right">Create Task</a>
+            </span>
             <span th:unless="${onlyInProgress}">
-                <a href="/tasks/in-progress" class="btn btn-outline-info btn-lg float-right">Hide Completed Tasks</a>
+                <a href="/tasks/in-progress" class="btn btn-outline-info btn-lg btn-space float-right">Hide Completed Tasks</a>
             </span>
             <span th:if="${onlyInProgress}">
-                <a href="/tasks" class="btn btn-outline-info btn-lg float-right">Show Completed Tasks</a>
+                <a href="/tasks" class="btn btn-outline-info btn-lg btn-space float-right">Show Completed Tasks</a>
             </span>
         </h1>
 

@@ -37,19 +37,19 @@ $(document).ready(function () {
 //demo accounts
 $(document).ready(function () {
     $("#demo-manager-btn").click(function () {
-        $("#email").val("manager@mail.com");
+        $("#email").val("dummymanager2563086@gmail.com");
         $("#password").val("112233");
     });
 });
 $(document).ready(function () {
     $("#demo-ann-btn").click(function () {
-        $("#email").val("ann@mail.com");
+        $("#email").val("abdulrahmaan2585@gmail.com");
         $("#password").val("112233");
     });
 });
 $(document).ready(function () {
     $("#demo-mark-btn").click(function () {
-        $("#email").val("mark@mail.com");
+        $("#email").val("correaleon1999@gmail.com");
         $("#password").val("112233");
     });
 });

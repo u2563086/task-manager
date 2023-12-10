@@ -35,10 +35,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/register", "/", "/login", "/about", "/css/**", "/webjars/**")
+                .antMatchers("/register", "/", "/login", "/about", "/css/**", "/webjars/**", "/h2-console/**")
                 .permitAll()
 
-                .antMatchers("/profile/**", "/tasks/**", "/task/**", "/users", "/user/**", "/h2-console/**")
+                .antMatchers("/profile/**", "/tasks/**", "/task/**", "/users", "/user/**")
                 .hasAnyRole("USER, ADMIN")
 
                 .antMatchers("/assignment/**")
@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutSuccessUrl("/login");
 
-        http.csrf().ignoringAntMatchers("/h2-console/**");
+        http.csrf().ignoringAntMatchers("/h2-console/**", "/sendemail/**", "/register");
         http.headers().frameOptions().sameOrigin();
     }
 

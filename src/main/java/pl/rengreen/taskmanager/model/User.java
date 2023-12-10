@@ -135,8 +135,13 @@ public class User {
     public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
+    
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", email=" + email + ", name=" + name + "]";
+	}
 
-    @Override
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
